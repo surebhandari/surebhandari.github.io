@@ -1,3 +1,5 @@
+**What is the use of '->' and '=>' in Rust programming language ?**
+
 In the Rust programming language, both `->` and `=>` are used, but they serve different purposes and contexts:
 
 1. **`->` (Arrow Operator):**
