@@ -1,5 +1,5 @@
 ## Notes
 
-- [File 1](one.md)
+- [Duck Typing](one.md)
 - [File 2](test.md)
 
