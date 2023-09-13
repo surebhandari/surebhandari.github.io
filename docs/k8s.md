@@ -1,4 +1,5 @@
-**How to Attach Storage to containers in POD**
+**How to Attach Storage to containers in POD**:
+
 Here are the Steps to Follow.
 
 1. **Create the Persistent Volume (PV)**: In the PV definition, you should label the PV with the desired label (`type=logs`) so that the PVC can select it based on this label:
