@@ -1,5 +1,7 @@
 **How to Attach Storage to containers in POD**:
 
+**Context**: When somene wants to run a sidecar container alongside a main container and would like to have a shared storage. In that case, we need to go through 
+Persistent Volume(PV) and Persistent Volume Claim(PVC) because containers don't have any storage.
 Here are the Steps to Follow.
 
 1. **Create the Persistent Volume (PV)**: In the PV definition, you should label the PV with the desired label (`type=logs`) so that the PVC can select it based on this label:
