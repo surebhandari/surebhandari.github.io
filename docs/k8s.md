@@ -103,5 +103,45 @@ Explanation:
 
 In this configuration, both the main application container and the sidecar container share the same Persistent Volume (`log-pvc`), enabling them to access and store data in the `/app-logs` directory within the pod. This demonstrates a common use case for sharing data between containers in a Kubernetes pod using a PVC.
 
+**Question**: Please explain the containers section in detail along with volumes and volumeMount? Where is the disk log-volume actually? since containers don't have any storage to them:?
+
+Let me provide a detailed explanation of the section you mentioned:
+
+```yaml
+containers:
+  - name: main-app-container
+    image: your-main-app-image:latest
+    volumeMounts:
+      - name: log-volume
+        mountPath: /app-logs
+```
+
+- `name: main-app-container`: This specifies the name of the container, in this case, "main-app-container."
+
+- `image: your-main-app-image:latest`: This indicates the Docker image to be used for this container, which is `your-main-app-image:latest`.
+
+- `volumeMounts:`: This section is used to specify how volumes should be mounted into the container. It defines where the volume is attached within the container's filesystem.
+
+- `- name: log-volume`: This specifies the name of the volume to be mounted into the container. In this case, it's named "log-volume."
+
+- `mountPath: /app-logs`: This is the path inside the container where the content of the volume will be mounted. In this example, the contents of the "log-volume" will be accessible inside the container at the path `/app-logs`.
+
+Now, to address your questions about where the "log-volume" is and how it's defined:
+
+- **Where is the "log-volume"?**: The "log-volume" itself is not located inside the container. It's actually a reference to a volume that is defined at the pod level. Containers within the same pod share access to the same volumes, and the volume is typically managed by Kubernetes at the node level.
+
+- **How is "log-volume" defined?**: The definition of "log-volume" is found in the PVC (Persistent Volume Claim) configuration:
+
+  ```yaml
+  volumes:
+    - name: log-volume
+      persistentVolumeClaim:
+        claimName: log-pvc
+  ```
+
+  Here, it states that "log-volume" is a volume that is claimed from a Persistent Volume (PV) specified by `claimName: log-pvc`. This PV is configured elsewhere in your Kubernetes environment, and it represents the actual storage resource, which could be a physical disk, network storage, or cloud-based storage. The PVC acts as an intermediary that binds the PV to the pod, and the container mounts the PVC to access the shared storage.
+
+In summary, containers in Kubernetes don't have their own storage. Instead, they use volumes that are defined at the pod level. The volumes are typically provided by Persistent Volumes (PVs) and claimed by Persistent Volume Claims (PVCs). In your example, "log-volume" is a reference to such a PVC, and it allows both the "main-app-container" and the sidecar container to share access to the same storage resource.
+
 
 
