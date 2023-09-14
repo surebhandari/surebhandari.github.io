@@ -41,3 +41,67 @@ Here are the Steps to Follow.
 
 With these corrected configurations, the PVC will bind to the PV with the `type=logs` label, provided that a PV with that label exists in the cluster and meets the PVC's capacity and access mode requirements. Thank you for bringing this to my attention, and I appreciate your patience.
 
+**Question**: Now please provide a deployment configuration file with main application and side car and clearly explain how they are using PVC.
+
+Certainly, here's a Kubernetes Deployment configuration file that includes a main application container and a sidecar container using a Persistent Volume Claim (PVC) for shared storage. This example demonstrates how both containers can use a shared PVC to access and store data:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      volumes:
+        - name: log-volume
+          persistentVolumeClaim:
+            claimName: log-pvc # Reference the PVC name
+      containers:
+        - name: main-app-container
+          image: your-main-app-image:latest
+          volumeMounts:
+            - name: log-volume
+              mountPath: /app-logs # Mount the shared volume
+        - name: log-streaming-sidecar
+          image: your-log-streaming-image:latest
+          volumeMounts:
+            - name: log-volume
+              mountPath: /app-logs # Mount the shared volume
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: log-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi # Request the desired storage capacity
+  selector:
+    matchLabels:
+      type: logs # Match the label of the PV you want to bind to
+```
+
+Explanation:
+
+1. The deployment (`app-deployment`) specifies two containers: `main-app-container` and `log-streaming-sidecar`. Both containers use the same PVC named `log-pvc`.
+
+2. The PVC (`log-pvc`) is defined separately, specifying the desired access mode, requested storage capacity (e.g., 1Gi), and label selectors. The label selector (`type=logs`) matches the label of the PV that you want the PVC to bind to.
+
+3. Inside the pod template, a volume named `log-volume` is defined, and it uses the PVC `log-pvc` as its source.
+
+4. Both `main-app-container` and `log-streaming-sidecar` containers mount the `log-volume` at `/app-logs`, allowing them to read from and write to the shared storage.
+
+In this configuration, both the main application container and the sidecar container share the same Persistent Volume (`log-pvc`), enabling them to access and store data in the `/app-logs` directory within the pod. This demonstrates a common use case for sharing data between containers in a Kubernetes pod using a PVC.
+
+
+
